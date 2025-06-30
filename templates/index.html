@@ -1,59 +1,70 @@
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>Blockchain Anomaly Detector</title>
-    </head>
-    <body>
-        <h1>AI-Powered Blockchain Anomaly Detector</h1>
-        <form method="POST">
-            <label>Enter Ethereum Address:</label>
-            <input type="text" name="address" required>
-            <button type="submit">Analyze</button>
-        </form>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>EthGuard – AI-Powered Ethereum Anomaly Detector</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
 
-        {% if error %}
-            <script>alert("{{ error }}");</script>
-        {% endif %}
+    <h1>EthGuard – AI-Powered Ethereum Anomaly Detector</h1>
 
-        {% if anomalies is not none %}
+    <form method="POST">
+        <label for="address"><strong>Enter Ethereum Address:</strong></label>
+        <input type="text" id="address" name="address" placeholder="0x..." required>
+        <button type="submit">Analyze</button>
+    </form>
+
+    {% if error %}
+        <script>alert("{{ error }}");</script>
+    {% endif %}
+
+    {% if anomalies is not none %}
         <h2>Anomalous Transactions Detected</h2>
+
         {% if anomalies.empty %}
             <p>No anomalies found or insufficient data.</p>
         {% else %}
+
             <h3>Feature Comparison</h3>
             <img src="/static/feature_comparison.png" alt="Feature Comparison">
+
             <h3>Time Series Plot</h3>
             <img src="{{ url_for('static', filename='time_series.png') }}" alt="Time Series Plot">
+
             <h3>Value vs. Gas Price Scatter Plot</h3>
             <img src="{{ url_for('static', filename='scatter_plot.png') }}" alt="Scatter Plot">
 
-            <table border="1">
-                <tr>
-                    <th>Hash</th>
-                    <th>From</th>
-                    <th>To</th>
-                    <th>Value (ETH)</th>
-                    <th>Gas Price (Gwei)</th>
-                    <th>Timestamp</th>
-                    <th>Anomaly Score</th>
-                </tr>
-                {% for _, row in anomalies.iterrows() %}
-                <tr>
-                    <td>{{ row['hash'] }}</td>
-                    <td>{{ row['from'] }}</td>
-                    <td>{{ row['to'] }}</td>
-                    <td>{{ row['value'] }}</td>
-                    <td>{{ row['gasPrice'] }}</td>
-                    <td>{{ row['timeStamp'] }}</td>
-                    <td>{{ "%.5f"|format(row['anomaly_score']) }}</td>
-                </tr>
-                {% endfor %}
-            </table>
-            {% if not anomalies.empty %}
-                <a href="/download_csv"><button>Download as CSV</button></a>
-            {% endif %}
+            <div class="scrollable-table">
+                <table>
+                    <tr>
+                        <th>Hash</th>
+                        <th>From</th>
+                        <th>To</th>
+                        <th>Value (ETH)</th>
+                        <th>Gas Price (Gwei)</th>
+                        <th>Timestamp</th>
+                        <th>Anomaly Score</th>
+                    </tr>
+                    {% for _, row in anomalies.iterrows() %}
+                    <tr>
+                        <td>{{ row['hash'][:10] }}...</td>
+                        <td>{{ row['from'][:8] }}...</td>
+                        <td>{{ row['to'][:8] }}...</td>
+                        <td>{{ row['value'] }}</td>
+                        <td>{{ row['gasPrice'] }}</td>
+                        <td>{{ row['timeStamp'] }}</td>
+                        <td>{{ "%.5f"|format(row['anomaly_score']) }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
 
+            <div class="button-group">
+                <a href="/download_csv"><button>Download CSV</button></a>
+                <a href="/download_pdf"><button>Download PDF Report</button></a>
+            </div>
         {% endif %}
     {% endif %}
-    </body>
-    </html>
+
+</body>
+</html>

@@ -1,6 +1,7 @@
 import io
 import re
 from flask import Flask, render_template, request, send_file
+from fpdf import FPDF
 import requests
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -150,6 +151,25 @@ def download_csv():
                          as_attachment=True,
                          download_name='anomalies_report.csv')
     return "No data available to download."
+
+
+@app.route('/download_pdf')
+def download_pdf():
+    if 'anomalies_df' in globals():
+        pdf = FPDF()
+        pdf.add_page()
+        pdf.set_font("Arial", size=12)
+        pdf.cell(200, 10, txt="EthGuard - Ethereum Anomaly Report", ln=1, align='C')
+        pdf.ln(10)
+
+        for index, row in anomalies_df.head(20).iterrows():
+            line = f"{row['hash'][:10]} | {row['from'][:6]}... -> {row['to'][:6]} | {row['value']} ETH | Score: {round(row['anomaly_score'], 4)}"
+            pdf.cell(200, 10, txt=line, ln=True)
+
+        pdf_output = "static/anomaly_report.pdf"
+        pdf.output(pdf_output)
+        return send_file(pdf_output, as_attachment=True)
+    return "No data available for PDF report."
 
 
 if __name__ == "__main__":
