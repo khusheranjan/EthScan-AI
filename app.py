@@ -1,4 +1,5 @@
 import io
+import os
 import re
 from flask import Flask, render_template, request, send_file
 from fpdf import FPDF
@@ -10,7 +11,7 @@ from sklearn.preprocessing import StandardScaler
 
 app = Flask(__name__)
 
-ETHERSCAN_API_KEY = "U2KQFDP1M9UQ5RFSQ5P8TGESGJ5J183HZZ"  
+ETHERSCAN_API_KEY = os.getenv("API_KEY")
 
 def is_valid_eth_address(address):
     return bool(re.match(r"^0x[a-fA-F0-9]{40}$", address))
